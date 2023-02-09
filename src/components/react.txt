@@ -1,0 +1,5 @@
+1. Set up a React app
+2. adding firebase authentication to react app
+3. test it with an empty html form
+4. add styling
+5. add fake data for homes and stuff
