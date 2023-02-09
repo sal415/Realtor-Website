@@ -29,7 +29,7 @@ export default function OAuth() {
       }
       navigate('/')
     } catch (error) {
-      toast.error('incorrect')
+      toast.error('Something went wrong')
       // console.error(error)
     }
   }
