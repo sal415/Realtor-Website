@@ -1,6 +1,6 @@
 import { getAuth, SAMLAuthProvider, updateProfile } from 'firebase/auth'
-import { doc, updateDoc } from 'firebase/firestore';
-import React, { useState } from 'react'
+import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { db } from '../firebase';
@@ -9,6 +9,8 @@ export default function Profile() {
   const [formData, setFormData] = useState({name: 'sal', email:'salmandoria@gmail.com',});
   const {name, email} = formData
   const auth = getAuth()
+  const [listings, setListings] = useState(null)
+  const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
   const [changeDetail, setChangeDetail] = useState(false)
   function onLogout() {
@@ -38,7 +40,23 @@ export default function Profile() {
       toast.error("Unable to update profile details.")
     }
   }
-
+  useEffect(() => {
+    async function fetchUserListings(){
+      const listingRef = collection(db, 'listings')
+      const q = query(listingRef, where('userRef', '==', auth.currentUser.uid), orderBy('timestamp', 'desc'));
+      const querySnap = await getDocs(q)
+      let listings = []
+      querySnap.forEach((doc) => {
+        return listings.push({
+          id: doc.id,
+          data: doc.data()
+        })
+      })
+      setListings(listings)
+      setLoading(false)
+    }
+    fetchUserListings()
+  },[auth.currentUser.uid])
   return (
     <>
     <section className='max-w-6xl mx-auto flex justify-center items-center flex-col'>
@@ -63,6 +81,7 @@ export default function Profile() {
           </button>
       </div>
       </section>
+      <div></div>
     
       </>
   )

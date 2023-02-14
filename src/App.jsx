@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import React from 'react';
+
 // import reactLogo from './assets/react.svg'
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
@@ -13,6 +15,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import PrivateRoute from './components/PrivateRoute';
 import CreateListing from './pages/CreateListing'
+
 
 // // import Listing from './pages/Listing'
 
@@ -48,6 +51,7 @@ function App() {
                 <Header/>
                  <Routes>
                      <Route path='/' element={<Home/>}/>
+
                      <Route path='/profile' element={<PrivateRoute/>}>
                       {/* navigates user to sign in if not logged in */}
                       <Route path='/profile' element={<Profile/>}/>
@@ -55,7 +59,11 @@ function App() {
                      <Route path='/sign-in' element={<SignIn/>}/>
                      <Route path='/sign-up' element={<SignUp/>}/>
                      <Route path='/offers' element={<Offers/>}/>
+
+                     <Route path='/create-listing' element={<PrivateRoute/>}>
                      <Route path='/create-listing' element={<CreateListing/>}/>
+                     </Route>
+
                      {/* <Route path='/category/:categoryName/:listingId' element={<Listing/> }/> */}
                      <Route path='/forgot-password' element={<ForgotPassword/>}/>
                  </Routes>

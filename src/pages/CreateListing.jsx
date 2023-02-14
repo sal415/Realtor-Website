@@ -1,22 +1,152 @@
 import React, { useState } from 'react'
-
+import { toast } from 'react-toastify';
+import Loading from '../components/Loading';
+import {getAuth} from 'firebase/auth'
+import {getStorage, ref, uploadBytesResumable, getDownloadURL} from 'firebase/storage'
+import {v4 as uuidv4} from 'uuid'
+import {addDoc, collection, serverTimestamp} from 'firebase/firestore'
+import {db} from '../firebase'
+import {useNavigate} from 'react-router-dom'
 export default function () {
-    const [formData, setFormData] = useState({type: 'rent', name: "", bedrooms: 1, bathrooms: 1, parking: false, furnished: false, address: '', description: '', offer: false, regularPrice: 0, discountedPrice: 0})
-    const {type, name, bedrooms, bathrooms, parking, furnished, address, description, offer, regularPrice, discountedPrice} = formData;
-
-
-    function onChange(){
+    const navigate = useNavigate()
+    const [formData, setFormData] = useState({type: 'rent', name: "", bedrooms: 1, bathrooms: 1, parking: false, furnished: false, address: '', description: '', offer: false, regularPrice: 0, discountedPrice: 0, latitude: 0, longitude: 0, images: {} })
+    const {type, name, bedrooms, bathrooms, parking, furnished, address, description, offer, regularPrice, discountedPrice, latitude, longitude, images} = formData;
+    const [geolocationEnabled, setGeoLocationEnabled] =  useState(true)
+    const [loading, setLoading] = useState(false)
+    const auth = getAuth()
+    
+    function onChange(e) {
+        let boolean = null;
+    if (e.target.value === "true") {
+        boolean = true;
     }
+    if (e.target.value === "false") {
+      boolean = false;
+    }
+
+    if (e.target.files) {
+      setFormData((prevState) => ({
+          ...prevState,
+          images: e.target.files
+        }));
+    }
+
+    if (!e.target.files) {
+      setFormData((prevState) => ({
+        ...prevState,
+        [e.target.id]: boolean ?? e.target.value,
+    }));
+}
+}
+async function onSubmit(e){
+    e.preventDefault()
+    setLoading(true)
+    if(+discountedPrice >= +regularPrice){
+        setLoading(false)
+        toast.error('Discounted price is not less than regular price')
+        return
+    }
+    if(images.length > 6){
+        setLoading(false)
+        toast.error('No more than 6 images please.')
+        return
+    }
+    let geolocation = {}
+    let location;
+    if (geolocationEnabled){
+        console.log(import.meta)
+        const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${import.meta.env.VITE_REACT_APP_GEOCODE_API_KEY}`);
+        const data = await response.json()
+        console.log(data)
+        geolocation.lat = data.results[0]?.geometry.location.lat ?? 0;
+        geolocation.lng = data.results[0]?.geometry.location.lng ?? 0;
+
+        location = data.status === 'ZERO_RESULTS' && undefined;
+
+        if(location === undefined){
+            setLoading(false)
+            toast.error('Please enter a valid address')
+            return
+        }
+    }
+    else {
+        geolocation.lat = latitude
+        geolocation.lng = longitude
+    }
+    
+    async function storeImage(image) {
+        return new Promise((resolve, reject) => {
+            const storage = getStorage()
+            const filename = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
+            const storageRef = ref(storage, filename)
+            const uploadTask = uploadBytesResumable(storageRef, image)
+            uploadTask.on(
+                "state_changed",
+                (snapshot) => {
+                const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log("Upload is " + progress + "% done");
+                switch (snapshot.state){
+                    case "paused":
+                        console.log('Upload is paused');
+                        break;
+
+                    case "running":
+                        console.log('upload is running')
+                        break;
+                }
+                },
+                (error) => {
+                    reject(error)
+                },
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
+                        resolve(downloadUrl)
+                    })
+                }
+            )
+        })
+    }
+    const imgUrls = await Promise.all(
+        [...images].map((image) => storeImage(image))
+        ).catch((error)=>{
+            setLoading(false)
+            toast.error('Images not uploaded')
+            return
+        })
+        console.log(imgUrls)
+
+        const formDataCopy = {
+            ...formData,
+            imgUrls,
+            geolocation,
+            timeStamp: serverTimestamp(),
+            userRef: auth.currentUser.uid,
+        }
+        delete formDataCopy.images
+        !formDataCopy.offer && delete formDataCopy.discountedPrice
+        delete formDataCopy.latitude
+        delete formDataCopy.longitude
+        const docRef = await addDoc(collection(db, 'listings'), formDataCopy);
+        setLoading(false)
+        toast.success('Listing created!!!')
+        navigate(`/category/${formDataCopy.type}/${docRef.id}`)
+}
+
+
+if(loading){
+  return <Loading/>
+}
 
   return (
 <main>
     <h1 className='text-3xl text-center font-semibold'>Create a listing</h1>
-    <form>
+    <form onSubmit={onSubmit}> 
         <p>Sell/Rent</p>
         <div className='flex'>
             <button type='button' id='type' value="sale" onClick={onChange} className={`px-7 py-3 font-medium shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg w-full mr-3 ${type === "rent" ? "bg-white text-black" : "bg-slate-500 text-white" }`}>Sell</button>
 
-            <button type='button' id='type' value="sale" onClick={onChange} className={`px-7 py-3 font-medium shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg w-full ml-3 ${type === "sale" ? "bg-white text-black" : "bg-slate-500 text-white" }`}>Rent</button>
+            <button type='button' id='type' value="rent" onClick={onChange} className={`px-7 py-3 font-medium shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg w-full ml-3 ${type === "sale" ? "bg-white text-black" : "bg-slate-500 text-white" }`}>Rent</button>
         </div>
 
 
@@ -49,12 +179,31 @@ export default function () {
         <div className='flex'>
             <button type='button' id='furnished' value={true} onClick={onChange} className={`px-7 py-3 font-medium shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg w-full mr-3 ${!furnished ? "bg-white text-black" : "bg-slate-500 text-white" }`}>YES</button>
 
-            <button type='button' id='type' value={false} onClick={onChange} className={`px-7 py-3 font-medium shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg w-full ml-3 ${furnished ? "bg-white text-black" : "bg-slate-500 text-white" }`}>NO</button>
+            <button type='button' id='furnished' value={false} onClick={onChange} className={`px-7 py-3 font-medium shadow-md rounded hover:shadow-lg focus:shadow-lg active:shadow-lg w-full ml-3 ${furnished ? "bg-white text-black" : "bg-slate-500 text-white" }`}>NO</button>
         </div>
 
 
     <p className='text-lg mt-3 font-semibold'>Address</p>
         <textarea type='text' id='address' value={address} onChange={onChange} placeholder='Enter Address' maxLength = '32' minLength = '10'required className='w-full px-4 py-2 text-lg text-bl focus:text-gray-700 focus:bg-white focus:border-slate-500 mb-6 '></textarea>
+        {!geolocationEnabled && (
+                 <div className='flex space-x-6 mb-6'>
+                <div>
+                    <p className='text-lg font-semibold'>Latitude</p>
+                    <input type='number' id='latitude' value={latitude} onChange={onChange} required min='-90' max='90' className='w-full px-4 py-2 text-xl bg-white border text-center'/>
+                </div>
+
+                <div>
+                    <p className='text-lg font-semibold'>Longitude</p>
+                    <input type='number' id='longitude' value={longitude} onChange={onChange} required min='-180' max='180'className='w-full px-4 py-2 text-xl bg-white border text-center'/>
+                </div>
+                 </div>
+
+            
+
+
+        )}
+
+
 
     <p className='text-lg font-semibold'>Description</p>
         <textarea type='text' id='description' value={description} onChange={onChange} placeholder='Add description' maxLength = '32' minLength = '10'required className='w-full px-4 py-2 text-lg text-bl focus:text-gray-700 focus:bg-white focus:border-slate-500 mb-6 '></textarea>
