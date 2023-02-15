@@ -37,18 +37,18 @@ export default function SignIn() {
   return (
     <section>
        <h1 className = "text-3xl text-center mt-6 font-bold">Sign In</h1>
-       <div className='flex justify-center flex-wrap items-center px-6 py-12 max-w-6xl mx-auto'>
-        <div className='md:w-[67%] lg:w-[50%] mb-12 md:mb-6'>
+       <div className=' flex flex-col  	align-content: center; justify-center items-center px-6 py-12 max-w-6xl mx-auto'>
+        <div className='md:w-[67%] lg:w-[50%] mb-12 md:'>
             <img className='rounded-2xl' src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8aG91c2V8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60' alt='house' />
         </div>
             {/* change className from being on div to form see what the difference is, why does it work on div, is it because the form is already inside the div??? */}
-            <div className='w-full md:w-[67%] lg:w-[40%] lg:ml-20'> 
+            <div className='w-full md:w-[67%] lg:w-[40%] '> 
                 <form onSubmit={onSubmit}> 
                     <input type='email' id='email' value={email}  onChange={onChange} placeholder="Enter your email address" 
-                    className="mb-6 w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out" />
+                    className="mb-6 w-full px-4 py-2 text-xl text-gray-700 bg-white border-blue-500 rounded transition ease-in-out" />
                     <div className='relative mb-6'>
                     <input type={showPassword ? 'text' : 'password'} id='password' value={password} onChange={onChange} placeholder="Password"
-                    className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out " /> 
+                    className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-blue-500 rounded transition ease-in-out " /> 
                     {showPassword ? <AiFillEyeInvisible className="absolute right-3 top-3 text-xl cursor-pointer" onClick={() => setShowPassword((prevState) => !prevState)} /> : <AiFillEye className='absolute right-3 top-3 text-xl cursor-pointer' onClick={() =>  setShowPassword ((prevState) => !prevState)}/>}
 
                     </div>

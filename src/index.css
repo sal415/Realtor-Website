@@ -2,7 +2,5 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
-    background-color: rgb(240, 253, 244); 
-}
+
 /* creating sign in, signup, forgot password pages vid code above^^^  */
