@@ -44,9 +44,9 @@ export default function Home() {
         listings.map((x)=>{
           console.log(x)
           return(
-            <div className='w-[30%] border-gray-500'>
+            <div className='w-[30%] border-gray-500 mb-12'>
 
-                <img className='w-[90%] mt-10' src={x.data.imgUrls}/>
+                <img className='w-[90%] h-[90%] mt-10' src={x.data.imgUrls}/>
                 <p className='text-cyan-600'>Listing Name: {x.data.name}</p>
                 <p className='text-cyan-600'>Address: {x.data.address}</p>
                 <p className='text-cyan-600'># of Bathrooms: {x.data.bathrooms}</p>

@@ -151,7 +151,7 @@ if(loading){
 
 
         <p className='text-lg mt-3 font-semibold'>Name</p>
-        <input type='text' id='name' value={name} onChange={onChange} placeholder='Enter Name' maxLength = '32' minLength = '10'required className='w-full px-4 py-2 text-lg text-bl focus:text-gray-700 focus:bg-white focus:border-slate-500 mb-6 '></input>
+        <input type='text' id='name' value={name} onChange={onChange} placeholder='Enter Name'  minLength = '10'required className='w-full px-4 py-2 text-lg text-bl focus:text-gray-700 focus:bg-white focus:border-slate-500 mb-6 '></input>
 
         <div className='flex space-x-6 mb-6 '>
             <div>
@@ -184,7 +184,7 @@ if(loading){
 
 
     <p className='text-lg mt-3 font-semibold'>Address</p>
-        <textarea type='text' id='address' value={address} onChange={onChange} placeholder='Enter Address' maxLength = '32' minLength = '10'required className='w-full px-4 py-2 text-lg text-bl focus:text-gray-700 focus:bg-white focus:border-slate-500 mb-6 '></textarea>
+        <textarea type='text' id='address' value={address} onChange={onChange} placeholder='Enter Address'  minLength = '10' required className='w-full px-4 py-2 text-lg text-bl focus:text-gray-700 focus:bg-white focus:border-slate-500 mb-6 '></textarea>
         {!geolocationEnabled && (
                  <div className='flex space-x-6 mb-6'>
                 <div>
@@ -206,7 +206,7 @@ if(loading){
 
 
     <p className='text-lg font-semibold'>Description</p>
-        <textarea type='text' id='description' value={description} onChange={onChange} placeholder='Add description' maxLength = '32' minLength = '10'required className='w-full px-4 py-2 text-lg text-bl focus:text-gray-700 focus:bg-white focus:border-slate-500 mb-6 '></textarea>
+        <textarea type='text' id='description' value={description} onChange={onChange} placeholder='Add description' minLength = '10'required className='w-full px-4 py-2 text-lg text-bl focus:text-gray-700 focus:bg-white focus:border-slate-500 mb-6 '></textarea>
 
 
      <p>Does your listing have any current offers?</p>

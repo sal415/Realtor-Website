@@ -9,7 +9,6 @@ import SwiperCore,{EffectFade, Navigation, Pagination} from 'swiper'
 import 'swiper/css/bundle'
 
 
-
 export default function Listing () {
     const params = useParams()
     const [listing, setListing] = useState(null)
@@ -46,8 +45,9 @@ export default function Listing () {
         <img className='w-[50%] m-auto mb-3' src={listing.imgUrls[5] }/>
           <p className='text-2xl font-semibold ml-3 text-center  position:fixed position: bottom-0 text-color-gray-500'>Listing Name: {listing.name}</p>
           <h1 className='text-xl font-semibold ml-3 text-center position: bottom-0'>Address: {listing.address}</h1>
+          <p className='text-xl font-semibold ml-3 text-center position: bottom-0'>Description: {listing.description}</p>
           <p className='text-xl font-semibold ml-3 text-center position: bottom-0'># of Bedrooms: {listing.bedrooms}</p>
-          <p className='text-xl font-semibold ml-3 text-center position: bottom-0'># of Bathrooms: {listing.Bathrooms}</p>
+          <p className='text-xl font-semibold ml-3 text-center position: bottom-0'># of Bathrooms: {listing.bathrooms}</p>
           <p></p>
        {/* {listing.} */}
         {/* <button className='bg-blue-500 w-[50%] align-middle ' onClick={contact}>Contact Agent</button> */}
